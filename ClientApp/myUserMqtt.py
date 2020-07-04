@@ -37,11 +37,22 @@ class MyUser:
     '''Allows you to send an audio file (the voice note) to the server using a TCP socket.
         The user connects to the server and at the end closes the socket.'''
     def send_recorded_audio(self):
+        print('ENTRO!')
         audio = open(f'VoiceMsj_sent/{self.recorded_audio}', 'rb')
         client_socket.connect((SERVER_IP, SERVER_PORT))
         client_socket.sendfile(audio, 0)
         client_socket.close()
         audio.close()
+        # try:
+        #     client_socket.connect((SERVER_IP, SERVER_PORT))
+        #     print('PASO!')
+        #     audio = open(f'VoiceMsj_sent/{self.recorded_audio}', 'rb')
+        #     client_socket.sendfile(audio, 0)
+        #     audio.close()
+        # except ConnectionRefusedError:
+        #     print('ERROR')
+        # finally:
+        #     client_socket.close()
 
     # Allows you to receive an audio file (a voice note) from the server using a TCP socket.
     def receive_audio(self):

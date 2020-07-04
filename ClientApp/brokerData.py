@@ -1,15 +1,15 @@
 # Connection parameters for MQTT broker.
-# MQTT_HOST = '167.71.243.238'
-MQTT_HOST = 'localhost'
+MQTT_HOST = '192.168.1.60'
+# MQTT_HOST = 'localhost'
 MQTT_PORT = 1883
 
 # Connections credentials for MQTT broker.
-MQTT_USER = "proyectos"
-MQTT_PASS = "proyectos980"
+MQTT_USER = "rpi"
+MQTT_PASS = "raspi4"
 
 # Connection parameters for TCP.
-# SERVER_IP = '167.71.243.238'
-SERVER_IP = 'localhost'
+SERVER_IP = '192.168.1.60'
+# SERVER_IP = 'localhost'
 SERVER_PORT = 9819
 
 # Configuration file names for the client.
