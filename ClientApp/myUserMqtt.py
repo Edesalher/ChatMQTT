@@ -3,10 +3,6 @@ from datetime import datetime
 import paho.mqtt.client as mqtt
 import os
 import socket
-import time
-
-# Creating a socket for the client using IPv4 and TCP.
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
 class MyUser:
@@ -37,41 +33,41 @@ class MyUser:
     '''Allows you to send an audio file (the voice note) to the server using a TCP socket.
         The user connects to the server and at the end closes the socket.'''
     def send_recorded_audio(self):
-        print('ENTRO!')
-        audio = open(f'VoiceMsj_sent/{self.recorded_audio}', 'rb')
-        client_socket.connect((SERVER_IP, SERVER_PORT))
-        client_socket.sendfile(audio, 0)
-        client_socket.close()
-        audio.close()
-        # try:
-        #     client_socket.connect((SERVER_IP, SERVER_PORT))
-        #     print('PASO!')
-        #     audio = open(f'VoiceMsj_sent/{self.recorded_audio}', 'rb')
-        #     client_socket.sendfile(audio, 0)
-        #     audio.close()
-        # except ConnectionRefusedError:
-        #     print('ERROR')
-        # finally:
-        #     client_socket.close()
+        # Creating a socket for the client using IPv4 and TCP.
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            client_socket.connect((SERVER_IP, SERVER_PORT))
+            audio = open(f'VoiceMsj_sent/{self.recorded_audio}', 'rb')
+            client_socket.sendfile(audio, 0)
+            audio.close()
+        except ConnectionRefusedError:
+            print('ERROR!')
+        finally:
+            client_socket.close()
 
-    # Allows you to receive an audio file (a voice note) from the server using a TCP socket.
+    '''Allows you to receive an audio file (a voice note) from the server using a TCP socket.
+        The user connects to the server and at the end closes the socket.'''
     def receive_audio(self):
         current_time = datetime.now()                       # Get the current time.
         time_date = int(datetime.timestamp(current_time))   # Convert time to UNIX format.
         self.audio_received = f'{time_date}.wav'
-
-        '''An audio file is created. It opens in binary and is received. 
-            The user connects to the server and at the end closes the socket.'''
-        audio = open(f'VoiceMsj_received/{self.audio_received}', 'wb')
-        client_socket.connect((SERVER_IP, SERVER_PORT))
-        while True:
-            reception = client_socket.recv(BUFFER_SIZE)
-            if reception:
-                audio.write(reception)
-            else:
-                break
-        client_socket.close()
-        audio.close()
+        # Creating a socket for the client using IPv4 and TCP.
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            client_socket.connect((SERVER_IP, SERVER_PORT))
+            # An audio file is created. It opens in binary and is received.
+            audio = open(f'VoiceMsj_received/{self.audio_received}', 'wb')
+            while True:
+                reception = client_socket.recv(BUFFER_SIZE)  # Reception of the audio file.
+                if reception:
+                    audio.write(reception)
+                else:
+                    break
+            audio.close()
+        except ConnectionRefusedError:
+            print('ERROR!')
+        finally:
+            client_socket.close()
 
     def play_received_audio(self):
         os.system(f'aplay VoiceMsj_received/{self.audio_received}')
