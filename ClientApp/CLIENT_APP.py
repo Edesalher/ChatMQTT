@@ -20,7 +20,7 @@ def first_menu():
 def second_menu():
     new_print('\n\t¿A QUIÉN ENVIARÁ?', 1, 33)
     new_print('\t\ta - A usuario', 1, 33)
-    new_print('\t\ta - A sala', 1, 33)
+    new_print('\t\tb - A sala', 1, 33)
 
 
 def menu_options():
