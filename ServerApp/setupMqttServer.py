@@ -40,7 +40,7 @@ def on_connect(client, userdata, rc):
 
 # Function that is executed when a publication occurs.
 def on_publish(client, userdata, mid):
-    logging.info('¡Respuesta satisfactoria!')
+    logging.debug('¡Respuesta satisfactoria!')
 
 
 # Function that is executed when a message reception occurs.
@@ -55,12 +55,11 @@ def on_message(client, userdata, msg):
         server_commands.sender_ack = sender
         server_commands.flagAlive = True
         alive.add_user(sender)
-        alive.refresh_active_clients()
-        # if alive.alive_periods == 2:
-        #     alive.alive_periods = 0
-        #     alive.refresh_active_clients()
-        # else:
-        #     alive.alive_periods += 1
+        if alive.alive_periods == 2:
+            alive.alive_periods = 0
+            alive.refresh_active_clients()
+        else:
+            alive.alive_periods += 1
         logging.info(f'ACTIVOS >>>>>> {alive.active_clients}')
     elif command.encode() == COMMAND_FTR:
         print('\n')
