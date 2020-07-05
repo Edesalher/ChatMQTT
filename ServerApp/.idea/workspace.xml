@@ -3,7 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="7e7faafa-402f-42ff-8c3e-90e063a5460f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../ClientApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ClientApp/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ClientApp/CLIENT_APP.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ClientApp/CLIENT_APP.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myServerMqtt.py" beforeDir="false" afterPath="$PROJECT_DIR$/myServerMqtt.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -125,8 +125,8 @@ class AlivesControl:
     # Check if a user is active using the list of active clients.
     def check_client_status(self, user):
         active = False
-        for active in self.active_clients:
-            if user == active:
+        for active_user in self.active_clients:
+            if user == active_user:
                 active = True
                 break
         return active
