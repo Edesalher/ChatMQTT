@@ -1,5 +1,6 @@
 from myUserMqtt import *
 import logging
+import threading
 
 # Initial configuration for logging.
 logging.basicConfig(level=logging.INFO,
@@ -55,21 +56,42 @@ def on_message(client, userdata, msg):
         # The received byte string is split to read if it is a FRR, OK, NO or ACK.
         byte_string = msg.payload.decode().split('$')
         command = byte_string[0]
+        ID = byte_string[1]
 
         if command.encode() == COMMAND_OK:
-            print('\n')
-            logging.info('Enviando nota de voz...')
-            user.send_recorded_audio()
-            logging.info('Nota de voz enviada')
+            if ID == myID:
+                user_commands.set_oknoIDcheck_flag(True)
+                print('\n')
+                logging.info('Enviando nota de voz...')
+                user.send_recorded_audio()
+                logging.info('Nota de voz enviada')
+            else:
+                user_commands.set_oknoIDcheck_flag(False)
         elif command.encode() == COMMAND_NO:
-            print('\n')
-            logging.error('NO HA SIDO POSIBLE ENVIAR LA NOTA DE VOZ')
+            if ID == myID:
+                user_commands.set_oknoIDcheck_flag(True)
+                print('\n')
+                logging.error('\x1b[0;31m' + 'NO HA SIDO POSIBLE ENVIAR LA NOTA DE VOZ\n' + '\x1b[;m')
+            else:
+                user_commands.set_oknoIDcheck_flag(False)
         elif command.encode() == COMMAND_FRR:
             print('\n')
-            logging.info('Recibiendo nota de voz...')
+            logging.info(f'Has recibido una nota de voz de [{ID}]')
+            logging.info('Recibiendo...')
             user.receive_audio()
             logging.info('Nota de voz recibida')
-            # Ejecución del hilo para play_received_audio
+            logging.info('Reproduciendo nota de voz...')
+            # A thread is created to play the received voice note in the "background".
+            audio_thread = threading.Thread(name='Audio playback',
+                                            target=user.play_received_audio,
+                                            args=(),
+                                            daemon=False)
+            audio_thread.start()
+        elif command.encode() == COMMAND_ACK:
+            if ID == myID:
+                user_commands.set_ackIDcheck_flag(True)
+            else:
+                user_commands.set_ackIDcheck_flag(False)
 
 
 ''' Handler functions are set for the MQTT user when there is a connection, 
@@ -89,3 +111,10 @@ user.get_client().loop_start()
 user.get_client().subscribe([(f'comandos/{GROUP}/{myID}', qos), (f'usuarios/{GROUP}/{myID}', qos)])
 for room in myRooms:
     user.get_client().subscribe((f'salas/{GROUP}/{room}', qos))
+
+# A thread is created to send Alives to the server in the "background".
+alive_thread = threading.Thread(name='Send Alive',
+                                target=user_commands.send_ALIVE,
+                                args=(),
+                                daemon=True)
+alive_thread.start()

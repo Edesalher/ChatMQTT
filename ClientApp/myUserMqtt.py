@@ -3,6 +3,7 @@ from datetime import datetime
 import paho.mqtt.client as mqtt
 import os
 import socket
+import time
 
 
 class MyUser:
@@ -77,6 +78,14 @@ class MyUserCommands:
     # Constructor method.
     def __init__(self, user_object):
         self.user = user_object       # This is the user that has been created.
+        self.OKNOID_check = False
+        self.ACK_ID_check = True
+
+    def set_oknoIDcheck_flag(self, flag):
+        self.OKNOID_check = flag
+
+    def set_ackIDcheck_flag(self, flag):
+        self.ACK_ID_check = flag
 
     '''Allows you to send an FTR command to the server when the user requests to send a voice note. 
     First, the structure of the FTR command is created and then it is sent to the corresponding topic.'''
@@ -88,3 +97,22 @@ class MyUserCommands:
 
         # self.user.publish(f'comandos/{GROUP}/{self.user.userID}', ftr_command, qos=qos, retain=False)
         self.user.send_text(f'comandos/{GROUP}/{self.user.userID}', ftr_command)
+
+    def send_ALIVE(self):
+        command = COMMAND_ALIVE
+        myID = self.user.userID.encode()
+        alive_command = command + b'$' + myID
+        periods = 0
+        # Take time 1
+        while True:
+            if self.ACK_ID_check:
+                self.user.send_text(f'comandos/{GROUP}', alive_command)
+                periods += 1
+                if periods == 3:
+                    self.ACK_ID_check = False
+                    periods = 0
+                time.sleep(ALIVE_PERIOD)
+            else:
+                self.user.send_text(f'comandos/{GROUP}', alive_command)
+                time.sleep(ALIVE_CONTINUOUS)
+            # Take time 2
