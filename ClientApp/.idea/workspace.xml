@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="0a5fac9e-faa7-449c-a761-3e072865f2cd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myUserMqtt.py" beforeDir="false" afterPath="$PROJECT_DIR$/myUserMqtt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setupMqttClient.py" beforeDir="false" afterPath="$PROJECT_DIR$/setupMqttClient.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ServerApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerApp/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ServerApp/myServerMqtt.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerApp/myServerMqtt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ServerApp/setupMqttServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ServerApp/setupMqttServer.py" afterDir="false" />
