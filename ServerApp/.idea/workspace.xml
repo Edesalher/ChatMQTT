@@ -4,7 +4,10 @@
     <list default="true" id="7e7faafa-402f-42ff-8c3e-90e063a5460f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/../ClientApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ClientApp/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../ClientApp/myUserMqtt.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ClientApp/myUserMqtt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ClientApp/setupMqttClient.py" beforeDir="false" afterPath="$PROJECT_DIR$/../ClientApp/setupMqttClient.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/myServerMqtt.py" beforeDir="false" afterPath="$PROJECT_DIR$/myServerMqtt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setupMqttServer.py" beforeDir="false" afterPath="$PROJECT_DIR$/setupMqttServer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +27,7 @@
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$/PycharmProjects/Repaso_TCP_UDP" />
+    <property name="last_opened_file_path" value="$USER_HOME$/examenfinal/ServerApp" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="SvnConfiguration">
@@ -41,13 +44,17 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="317" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1593891257458">
+    <state x="317" y="311" width="424" height="491" key="FileChooserDialogImpl" timestamp="1593908687106">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
-    <state x="317" y="311" width="424" height="491" key="FileChooserDialogImpl/72.27.1848.1053@72.27.1848.1053" timestamp="1593891257458" />
+    <state x="317" y="311" width="424" height="491" key="FileChooserDialogImpl/72.27.1848.1053@72.27.1848.1053" timestamp="1593908687106" />
     <state x="485" y="188" width="1022" height="737" key="SettingsEditor" timestamp="1593823583325">
       <screen x="72" y="27" width="1848" height="1053" />
     </state>
     <state x="485" y="188" width="1022" height="737" key="SettingsEditor/72.27.1848.1053@72.27.1848.1053" timestamp="1593823583325" />
+    <state x="366" y="326" width="325" height="462" key="refactoring.ChangeSignatureDialog" timestamp="1593915855358">
+      <screen x="72" y="27" width="1848" height="1053" />
+    </state>
+    <state x="366" y="326" width="325" height="462" key="refactoring.ChangeSignatureDialog/72.27.1848.1053@72.27.1848.1053" timestamp="1593915855358" />
   </component>
 </project>

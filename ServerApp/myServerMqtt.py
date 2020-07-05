@@ -49,8 +49,10 @@ class MyServerCommands:
         self.sender = None
         self.destination_user = None
         self.file_size = None
+        self.flagAlive = False
+        self.sender_ack = None
 
-    def set_destination(self, sender, destination_user, file_size):
+    def set_destination_data(self, sender, destination_user, file_size):
         self.sender = sender
         self.destination_user = destination_user
         self.file_size = file_size
@@ -73,3 +75,58 @@ class MyServerCommands:
 
         # self.server.publish(f'comandos/{GROUP}/{reply_to}', ok_command, qos=qos, retain=False)
         self.server.send_text(f'comandos/{GROUP}/{reply_to.decode()}', ok_command)
+
+    # Allows the server to respond NO to the client when a condition has been met.
+    def answer_NO(self):
+        command = COMMAND_NO
+        reply_to = self.sender.encode()
+        no_command = command + b'$' + reply_to
+
+        self.server.send_text(f'comandos/{GROUP}/{reply_to.decode()}', no_command)
+
+    # Allows the server to respond an ACK to the client when a condition has been met.
+    def answer_ACK(self):
+        command = COMMAND_ACK
+        while True:
+            reply_to = self.sender_ack.encode()
+            ack_command = command + b'$' + reply_to
+            if self.flagAlive:
+                self.server.send_text(f'comandos/{GROUP}/{reply_to.decode()}', ack_command)
+                self.flagAlive = False
+            else:
+                pass
+
+
+class AlivesControl:
+    # Constructor method.
+    def __init__(self):
+        self.alives_received = []  # Temporary list for the received alives.
+        self.active_clients = []   # This is the list of active clients.
+        self.alive_periods = 0     # Stores the number of alive periods that have passed.
+
+    '''Determines if a user is already on the active clients list.
+        If the user is in the list, it is not added. If the user is not in the list, it is added.'''
+    def add_user(self, user):
+        in_list = False
+        for item in self.alives_received:
+            if item == user:
+                in_list = True
+                break
+        if in_list:
+            pass
+        else:
+            self.alives_received.append(user)
+
+    # Allows the server to refresh the list of active clients using the temporary list of received alives.
+    def refresh_active_clients(self):
+        self.active_clients = self.alives_received.copy()
+        self.alives_received.clear()
+
+    # Check if a user is active using the list of active clients.
+    def check_client_status(self, user):
+        active = False
+        for active in self.active_clients:
+            if user == active:
+                active = True
+                break
+        return active
