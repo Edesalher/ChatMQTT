@@ -45,13 +45,10 @@ def on_publish(client, userdata, mid):
 
 # Function that is executed when a message reception occurs.
 def on_message(client, userdata, msg):
-    print('\n')
-    logging.info(f'Servidor ha recibido un comando en el topic [{msg.topic}]')
     topic_by_parts = msg.topic.split('/')
     # The received byte string is split to read if it is a FTR or ALIVE.
     byte_string = msg.payload.decode().split('$')
     command = byte_string[0]
-    logging.info(f'Comando << {command.encode()}')
 
     if command.encode() == COMMAND_ALIVE:
         sender = byte_string[1]
@@ -65,6 +62,9 @@ def on_message(client, userdata, msg):
             alive.alive_periods += 1
         logging.info(f'ACTIVOS >>>>>> {alive.active_clients}')
     elif command.encode() == COMMAND_FTR:
+        print('\n')
+        logging.info(f'Servidor ha recibido un comando en el topic [{msg.topic}]')
+        logging.info(f'Comando << {command.encode()}')
         sender = topic_by_parts[2]
         destination_ID = byte_string[1]
         file_size = byte_string[2]

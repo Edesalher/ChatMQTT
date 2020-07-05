@@ -50,7 +50,7 @@ class MyServerCommands:
         self.destination_user = None
         self.file_size = None
         self.flagAlive = False
-        self.sender_ack = None
+        self.sender_ack = ''
 
     def set_destination_data(self, sender, destination_user, file_size):
         self.sender = sender
