@@ -60,7 +60,7 @@ def on_message(client, userdata, msg):
             alive.refresh_active_clients()
         else:
             alive.alive_periods += 1
-        logging.info(f'ACTIVOS >>>>>> {alive.active_clients}')
+        logging.debug(f'ACTIVOS >>>>>> {alive.active_clients}')
     elif command.encode() == COMMAND_FTR:
         print('\n')
         logging.info(f'Servidor ha recibido un comando en el topic [{msg.topic}]')
