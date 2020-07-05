@@ -63,7 +63,7 @@ def on_message(client, userdata, msg):
             alive.refresh_active_clients()
         else:
             alive.alive_periods += 1
-        logging.info(f'ACTIVOS >>>>> {alive.active_clients}')
+        logging.info(f'ACTIVOS >>>>>> {alive.active_clients}')
     elif command.encode() == COMMAND_FTR:
         sender = topic_by_parts[2]
         destination_ID = byte_string[1]
