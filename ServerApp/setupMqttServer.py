@@ -29,8 +29,8 @@ server = MyServer()
 # Creating the commands for the server.
 server_commands = MyServerCommands(server)
 
-# An Alive controller is created to receive and read the Alive commands sent by the clients.
-alive = AlivesControl()
+# A user controller is created for the server to handle the list of active users, validations and others.
+alive = UserControl()
 
 
 # Function that is executed when a connection to the broker MQTT occurs.
