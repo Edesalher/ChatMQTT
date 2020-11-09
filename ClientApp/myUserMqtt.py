@@ -160,7 +160,7 @@ class MyUserCommands:
                 If the time is up and the server did not respond, the exit flag is set to True to indicate that 
                 the application should close.
                 """
-                if time.time() > initial_time + 1:
+                if time.time() > initial_time + 5:
                     if not self.ACK_ID_check:
                         self.exit_app = True
                         print('\n')
