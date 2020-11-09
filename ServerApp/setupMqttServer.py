@@ -52,6 +52,7 @@ def on_message(client, userdata, msg):
 
     if command.encode() == COMMAND_ALIVE:
         sender = byte_string[1]
+        # Acá debe ir la verificación de validez del ID.
         server_commands.sender_ack = sender
         server_commands.flagAlive = True
         alive.add_user(sender)
@@ -66,11 +67,14 @@ def on_message(client, userdata, msg):
         logging.info(f'Servidor ha recibido un comando en el topic [{msg.topic}]')
         logging.info(f'Comando << {command.encode()}')
         sender = topic_by_parts[2]
-        destination_ID = byte_string[1]
+        destination_id = byte_string[1]
+        # Primero debo comprobar si el remitente y el destino son válido.
         file_size = byte_string[2]
         # Algorithm that verifies if the destination is a user or room.
-        server_commands.set_destination_data(sender, destination_ID, file_size)
-        if alive.check_client_status(destination_ID):
+        # Si el destino es Sala, primero tengo que verificar qué usuarios son de esa sala.
+        # Y luego verifico quiénes de la sala están activos.
+        server_commands.set_destination_data(sender, destination_id, file_size)
+        if alive.check_client_status(destination_id):
             server_commands.answer_OK()
             logging.info('Servidor responde >> OK')
         else:
