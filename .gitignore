@@ -1,4 +1,5 @@
 .idea/
-*/.idea/
+ClientApp/.idea/
+ServerApp/.idea/
 */venv/
 */__pycache__/
