@@ -1,5 +1,5 @@
 # Connection parameters for MQTT broker.
-MQTT_HOST = '192.168.1.60'  # IP of my RPi4.
+MQTT_HOST = '192.168.1.18'  # IP of my RPi4.
 # MQTT_HOST = 'localhost'
 MQTT_PORT = 1883
 
@@ -8,7 +8,7 @@ MQTT_USER = "rpi"
 MQTT_PASS = "raspi4"
 
 # Connection parameters for TCP.
-SERVER_IP = '192.168.1.60'  # IP of my RPi4.
+SERVER_IP = '192.168.1.18'  # IP of my RPi4.
 # SERVER_IP = 'localhost'
 SERVER_PORT = 9819
 
