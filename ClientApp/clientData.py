@@ -1,5 +1,5 @@
 # Connection parameters for MQTT broker.
-MQTT_HOST = '192.168.1.60'
+MQTT_HOST = '192.168.1.60'  # IP of my RPi4.
 # MQTT_HOST = 'localhost'
 MQTT_PORT = 1883
 
@@ -8,7 +8,7 @@ MQTT_USER = "rpi"
 MQTT_PASS = "raspi4"
 
 # Connection parameters for TCP.
-SERVER_IP = '192.168.1.60'
+SERVER_IP = '192.168.1.60'  # IP of my RPi4.
 # SERVER_IP = 'localhost'
 SERVER_PORT = 9819
 
@@ -16,7 +16,7 @@ SERVER_PORT = 9819
 USER_FILENAME = 'usuario.txt'
 ROOMS_FILENAME = 'salas.txt'
 
-# Options
+# Identifier for each of the options that the user will have in the menu.
 SEND_TEXT = '1'
 SEND_VOICE_NOTE = '2'
 EXIT = '3'
