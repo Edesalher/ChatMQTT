@@ -1,5 +1,4 @@
 from myUserMqtt import *
-import logging
 import threading
 
 # Initial configuration for logging.
@@ -26,7 +25,7 @@ user_commands = MyUserCommands(user)
 
 
 # Function that is executed when a connection to the broker MQTT occurs.
-def on_connect(client, userdata, rc):
+def on_connect(client, userdata, flags, rc):
     logging.debug('CONECTADO AL BROKER')
 
 
@@ -102,9 +101,9 @@ user.get_client().on_message = on_message
 
 # The username and password for the MQTT broker are set and then the connection is established.
 user.get_client().username_pw_set(MQTT_USER, MQTT_PASS)
-user.get_client().connect(host=MQTT_HOST, port=MQTT_PORT)
+user.get_client().connect(host=MQTT_HOST, port=MQTT_PORT)  # We connect to the broker.
 
-# The thread is started so that the client is attentive to connection, publication and reception events.
+# The thread is started so that the client is attentive to the events of connection, publication and reception.
 user.get_client().loop_start()
 
 # The user subscribes to the corresponding topics.
