@@ -23,35 +23,49 @@ def second_menu():
     new_print('\t\tb - A sala', 1, 33)
 
 
+def check_exit_app_flag():
+    if user_commands.exit_app:
+        sys.exit()
+
+
 def menu_options():
     first_menu()
     option = new_input('\n\tOpción > ', 1, 36)
+    check_exit_app_flag()
 
     if option == SEND_TEXT:
         second_menu()
         destination = new_input('\n\tOpción > ', 1, 36)
+        check_exit_app_flag()
 
         if destination == TO_USER:
             destination_user = new_input('\tUser ID > ', 1, 36)
+            check_exit_app_flag()
             topic = f'usuarios/{GROUP}/{destination_user}'
             text = new_input('\tEscriba su mensajes >> ', 1, 36)
+            check_exit_app_flag()
             message = f'{text}|{myID}'
             user.send_text(topic, message)
         elif destination == TO_ROOM:
             destination_room = new_input('\tSala > ', 1, 36)
+            check_exit_app_flag()
             topic = f'salas/{GROUP}/{destination_room}'
             text = new_input('\tEscriba su mensajes >> ', 1, 36)
+            check_exit_app_flag()
             message = f'{text}|{myID}'
             user.send_text(topic, message)
 
     elif option == SEND_VOICE_NOTE:
         second_menu()
         destination = new_input('\n\tOpción > ', 1, 36)
+        check_exit_app_flag()
 
         if destination == TO_USER:
             destination_user = new_input('\tUser ID > ', 1, 36)
+            check_exit_app_flag()
             while True:
                 duration = new_input('\tIngrese la duración de la nota de voz en seg. > ', 1, 36)
+                check_exit_app_flag()
                 if int(duration) > 30:
                     print('\n')
                     logging.error('\x1b[0;31m'+'La duración no debe ser mayor a 30 seg.\n'+'\x1b[;m')
@@ -64,8 +78,10 @@ def menu_options():
             user_commands.send_FTR(destination_user, voice_note)
         elif destination == TO_ROOM:
             destination_room = new_input('\tSala > ', 1, 36)
+            check_exit_app_flag()
             while True:
                 duration = new_input('\tIngrese la duración de la nota de voz en seg. > ', 1, 36)
+                check_exit_app_flag()
                 if int(duration) > 30:
                     print('\n')
                     logging.error('\x1b[0;31m' + 'La duración no debe ser mayor a 30 seg.\n' + '\x1b[;m')
@@ -79,13 +95,13 @@ def menu_options():
 
     elif option == EXIT:
         print('\n')
-        logging.info('\x1b[0;31m'+'CERRANDO APLICACIÓN...'+'\x1b[;m')
+        logging.info('\x1b[0;31m'+'CERRANDO LA APLICACIÓN...'+'\x1b[;m')
         sys.exit()
 
 
 try:
     new_print('\n********* MENSAJERÍA MQTT **********', 1, 34)
-    while True:
+    while not user_commands.exit_app:
         menu_options()
 
 except KeyboardInterrupt:
