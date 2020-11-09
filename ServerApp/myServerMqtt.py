@@ -123,7 +123,7 @@ class MyServerCommands:
                 pass
 
 
-class AlivesControl:
+class UserControl:
     # Constructor method.
     def __init__(self):
         self.alives_received = []  # Temporary list for the received alives.
