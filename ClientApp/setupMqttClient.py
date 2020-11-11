@@ -1,5 +1,9 @@
 from myUserMqtt import *
 import threading
+import encryptionControl as ec
+
+# Do you want to use encryption?
+encryption = True
 
 # Initial configuration for logging.
 logging.basicConfig(level=logging.INFO,
@@ -39,17 +43,30 @@ def on_message(client, userdata, msg):
     topic_by_parts = msg.topic.split('/')
     root_topic = topic_by_parts[0]
 
-    if root_topic == 'usuarios':
-        message = msg.payload.decode().split('|')
-        print('\n')
-        logging.info(f'> Has recibido un texto de [{message[1]}]')
-        logging.info(f'>> {message[0]}')
-
-    elif root_topic == 'salas':
-        message = msg.payload.decode().split('|')
-        print('\n')
-        logging.info(f'Has recibido un texto de [{message[1]}] en la sala [{topic_by_parts[2]}]')
-        logging.info(f'>> {message[0]}')
+    if root_topic == 'usuarios' or root_topic == 'salas':
+        message = msg.payload
+        sender_of_the_message = '-----'
+        # If the UnicodeDecodeError exception occurs, it means that the received message is encrypted because
+        # it cannot be decoded.
+        try:
+            received_data = message.decode().split('|')
+            message = received_data[0]
+            sender_of_the_message = received_data[1]
+        except UnicodeDecodeError:
+            if encryption:
+                decrypted_data = ec.decrypt_message(message)
+                received_data = decrypted_data.decode().split('|')
+                message = received_data[0]
+                sender_of_the_message = received_data[1]
+            else:
+                pass
+        finally:
+            print('\n')
+            if root_topic == 'usuarios':
+                logging.info(f'Has recibido un texto de [{sender_of_the_message}]')
+            else:
+                logging.info(f'Has recibido un texto de [{sender_of_the_message}] en la sala [{topic_by_parts[2]}]')
+            logging.info(f'>> {message}')
 
     elif root_topic == 'comandos':
         # The received byte string is split to read if it is a FRR, OK, NO or ACK.
@@ -66,6 +83,7 @@ def on_message(client, userdata, msg):
                 logging.info('Nota de voz enviada')
             else:
                 user_commands.set_oknoIDcheck_flag(False)
+
         elif command.encode() == COMMAND_NO:
             if ID == myID:
                 user_commands.set_oknoIDcheck_flag(True)
@@ -73,6 +91,7 @@ def on_message(client, userdata, msg):
                 logging.error('\x1b[0;31m' + 'NO HA SIDO POSIBLE ENVIAR LA NOTA DE VOZ\n' + '\x1b[;m')
             else:
                 user_commands.set_oknoIDcheck_flag(False)
+
         elif command.encode() == COMMAND_FRR:
             print('\n')
             logging.info(f'Has recibido una nota de voz de [{ID}]')
@@ -86,6 +105,7 @@ def on_message(client, userdata, msg):
                                             args=(),
                                             daemon=False)
             audio_thread.start()
+
         elif command.encode() == COMMAND_ACK:
             if ID == myID:
                 user_commands.set_ackIDcheck_flag(True)
