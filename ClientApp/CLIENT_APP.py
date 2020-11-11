@@ -42,18 +42,28 @@ def menu_options():
             destination_user = new_input('\tUser ID > ', 1, 36)
             check_exit_app_flag()
             topic = f'usuarios/{GROUP}/{destination_user}'
+
             text = new_input('\tEscriba su mensajes >> ', 1, 36)
             check_exit_app_flag()
             message = f'{text}|{myID}'
-            user.send_text(topic, message)
+            if encryption:
+                encrypted_message = ec.encrypt_message(message)
+                user.send_text(topic, encrypted_message)
+            else:
+                user.send_text(topic, message)
         elif destination == TO_ROOM:
             destination_room = new_input('\tSala > ', 1, 36)
             check_exit_app_flag()
             topic = f'salas/{GROUP}/{destination_room}'
+
             text = new_input('\tEscriba su mensajes >> ', 1, 36)
             check_exit_app_flag()
             message = f'{text}|{myID}'
-            user.send_text(topic, message)
+            if encryption:
+                encrypted_message = ec.encrypt_message(message)
+                user.send_text(topic, encrypted_message)
+            else:
+                user.send_text(topic, message)
 
     elif option == SEND_VOICE_NOTE:
         second_menu()
