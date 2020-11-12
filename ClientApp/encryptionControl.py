@@ -17,17 +17,25 @@ def prepare_message(text):
     by the encrypt() function of AES. These blanks must be removed when decrypting.
 
     :param text: The text or character string to be encrypted.
-    :return: The result of the encryption.
+    :return: The new text.
     """
     while len(text) % 16 != 0:
         text = text + " "
     return text
 
 
-# def prepare_file(file): #SERN Este metodo añade bytes al archivo para que se encripte en pedezos de 16bytes
-#     while len(file)% 16 != 0:
-#         file = file + b'0'
-#     return file
+def prepare_file(file):
+    """
+    Description:
+    This function adds characters (blanks) in binary to make the audio be a multiple of 16 bytes so that it can be
+    encrypted by the encrypt() function of AES. These blanks must be removed when decrypting.
+
+    :param file: The audio file (voice note) to be encrypted.
+    :return: The new audio file.
+    """
+    while len(file) % 16 != 0:
+        file = file + b' '
+    return file
 
 
 def encrypt_message(text):
@@ -46,26 +54,29 @@ def decrypt_message(text):
     return decrypted_message
 
 
-# def CryptoAudio(archivo):  # SERN Para encriptar archivos
-#     cipher = AES.new(key, mode, IV)
-#
-#     # Nombrar con el nombre de audio grabado en cliente/ o llamar la variable que contenga el archivo.
-#     with open(archivo, 'rb') as f:
-#        Audio = f.read()
-#
-#     AudioMod = prepare_file(Audio)
-#     AudioEncriptado = cipher.encrypt(AudioMod)
-#
-#     with open('AudioEncriptado.txt', 'wb') as e:
-#        e.write(AudioEncriptado)         # SERN El archivo a enviar ahora sería AudioEncriptado.
-#
-#
-# def DesC_Audio(archivo):    # SERN Para desencriptar archivos
-#     cipher = AES.new(key, mode, IV)
-#     with open(archivo, 'rb') as fs:
-#         AudioEncriptado = fs.read()
-#
-#     AudioDesencriptado = cipher.decrypt(AudioEncriptado)
-#
-#     with open('AudioDesencriptado.mp3', 'wb') as es:   # Se le coloca el nombre según como pídio el ingeniero
-#         es.write(AudioDesencriptado.rstrip(b'0'))
+def encrypt_audio(audio_file):
+    # Creating the cipher with AES.
+    cipher = AES.new(key, mode, IV)
+    audio = open(f'VoiceMsj_sent/{audio_file}', 'rb')
+    data = audio.read()
+    audio.close()
+    data_to_encrypt = prepare_file(data)
+    encrypted_data = cipher.encrypt(data_to_encrypt)
+    # The audio file is overwritten with the encrypted data.
+    encrypted_audio = open(f'VoiceMsj_sent/{audio_file}', 'wb')
+    encrypted_audio.write(encrypted_data)
+    encrypted_audio.close()
+
+
+def decrypt_audio(audio_file):
+    # Creating the cipher with AES.
+    cipher = AES.new(key, mode, IV)
+    audio2 = open(f'VoiceMsj_received/{audio_file}', 'rb')
+    data2 = audio2.read()
+    audio2.close()
+    decrypted_data = cipher.decrypt(data2)
+    clean_data = decrypted_data.rstrip(b' ')
+    # The audio file is overwritten with the decrypted and clean data.
+    decrypted_audio = open(f'VoiceMsj_received/{audio_file}', 'wb')
+    decrypted_audio.write(clean_data)
+    decrypted_audio.close()
