@@ -2,12 +2,9 @@ from myUserMqtt import *
 import threading
 import encryptionControl as ec
 
-# Do you want to use encryption?
-encryption = True
-
 # Initial configuration for logging.
 logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)s] %(message)s')
+                    format='\t[%(levelname)s] %(message)s')
 
 # The usuario.txt file is read to obtain the user ID.
 user_file = open(USER_FILENAME, 'r')
@@ -69,28 +66,23 @@ def on_message(client, userdata, msg):
             logging.info(f'>> {message}')
 
     elif root_topic == 'comandos':
-        # The received byte string is split to read if it is a FRR, OK, NO or ACK.
+        # The received byte string is split to read if the command is a FRR, OK, NO or ACK.
         byte_string = msg.payload.decode().split('$')
         command = byte_string[0]
         ID = byte_string[1]
 
-        if command.encode() == COMMAND_OK:
+        if command.encode() == COMMAND_OK or command.encode() == COMMAND_NO:
             if ID == myID:
-                user_commands.set_oknoIDcheck_flag(True)
+                user_commands.OKNOID_check = True
                 print('\n')
-                logging.info('Enviando nota de voz...')
-                user.send_recorded_audio()
-                logging.info('Nota de voz enviada')
+                if command.encode() == COMMAND_OK:
+                    logging.info('Enviando nota de voz...')
+                    user.send_recorded_audio()
+                    logging.info('Nota de voz enviada')
+                else:
+                    logging.error('\x1b[0;31m' + 'NO HA SIDO POSIBLE ENVIAR LA NOTA DE VOZ\n' + '\x1b[;m')
             else:
-                user_commands.set_oknoIDcheck_flag(False)
-
-        elif command.encode() == COMMAND_NO:
-            if ID == myID:
-                user_commands.set_oknoIDcheck_flag(True)
-                print('\n')
-                logging.error('\x1b[0;31m' + 'NO HA SIDO POSIBLE ENVIAR LA NOTA DE VOZ\n' + '\x1b[;m')
-            else:
-                user_commands.set_oknoIDcheck_flag(False)
+                user_commands.OKNOID_check = False
 
         elif command.encode() == COMMAND_FRR:
             print('\n')
@@ -108,28 +100,28 @@ def on_message(client, userdata, msg):
 
         elif command.encode() == COMMAND_ACK:
             if ID == myID:
-                user_commands.set_ackIDcheck_flag(True)
+                user_commands.ACK_ID_check = True
             else:
-                user_commands.set_ackIDcheck_flag(False)
+                user_commands.ACK_ID_check = False
 
 
 ''' Handler functions are set for the MQTT user when there is a connection, 
     a message is received, and a message is posted.'''
-user.get_client().on_connect = on_connect
-user.get_client().on_publish = on_publish
-user.get_client().on_message = on_message
+user.client.on_connect = on_connect
+user.client.on_publish = on_publish
+user.client.on_message = on_message
 
 # The username and password for the MQTT broker are set and then the connection is established.
-user.get_client().username_pw_set(MQTT_USER, MQTT_PASS)
-user.get_client().connect(host=MQTT_HOST, port=MQTT_PORT)  # We connect to the broker.
+user.client.username_pw_set(MQTT_USER, MQTT_PASS)
+user.client.connect(host=MQTT_HOST, port=MQTT_PORT)  # We connect to the broker.
 
 # The thread is started so that the client is attentive to the events of connection, publication and reception.
-user.get_client().loop_start()
+user.client.loop_start()
 
 # The user subscribes to the corresponding topics.
-user.get_client().subscribe([(f'comandos/{GROUP}/{myID}', qos), (f'usuarios/{GROUP}/{myID}', qos)])
+user.client.subscribe([(f'comandos/{GROUP}/{myID}', qos), (f'usuarios/{GROUP}/{myID}', qos)])
 for room in myRooms:
-    user.get_client().subscribe((f'salas/{GROUP}/{room}', qos))
+    user.client.subscribe((f'salas/{GROUP}/{room}', qos))
 
 # A thread is created to send Alives to the server in the "background".
 alive_thread = threading.Thread(name='Send Alive',
