@@ -5,6 +5,10 @@ import os
 import socket
 import time
 import logging
+import encryptionControl as ec
+
+# Do you want to use encryption?
+encryption = True
 
 
 class MyUser:
@@ -14,10 +18,6 @@ class MyUser:
         self.userID = ID
         self.recorded_audio = None
         self.audio_received = None
-
-    # Allows you to get the object that represents the client mqtt of the user.
-    def get_client(self):
-        return self.client
 
     def send_text(self, destination_topic, msg):
         self.client.publish(destination_topic, msg, qos=qos, retain=False)
@@ -33,8 +33,8 @@ class MyUser:
         """
         # current_time = datetime.now()                       # Get the current time.
         # time_date = int(datetime.timestamp(current_time))   # Convert time to UNIX format.
+        current_date = date.today()  # Get the current date.
         # self.recorded_audio = f'{time_date}.wav'
-        current_date = date.today()                      # Get the current date.
         self.recorded_audio = f'AUD-{current_date}.wav'
 
         os.system(f'arecord -d {duration} -f U8 -r 8000 {self.recorded_audio}')
@@ -67,8 +67,8 @@ class MyUser:
         """
         # current_time = datetime.now()                       # Get the current time.
         # time_date = int(datetime.timestamp(current_time))   # Convert time to UNIX format.
-        # self.audio_received = f'{time_date}.wav'
         current_date = date.today()  # Get the current date.
+        # self.audio_received = f'{time_date}.wav'
         self.audio_received = f'AUD-{current_date}.wav'
         # Creating a socket for the client using IPv4 and TCP.
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -83,6 +83,12 @@ class MyUser:
                 else:
                     break
             audio.close()
+            if encryption:
+                # Only if the received voice note is encrypted will it be able to be decrypted.
+                try:
+                    ec.decrypt_audio(self.audio_received)
+                except ValueError:
+                    pass
         except ConnectionRefusedError:
             print('ERROR! the connection to the server failed.')
         finally:
@@ -99,12 +105,6 @@ class MyUserCommands:
         self.OKNOID_check = False
         self.ACK_ID_check = True
         self.exit_app = False         # This flag indicates whether the application should be closed or not.
-
-    def set_oknoIDcheck_flag(self, flag):
-        self.OKNOID_check = flag
-
-    def set_ackIDcheck_flag(self, flag):
-        self.ACK_ID_check = flag
 
     def send_FTR(self, destination, file):
         """
