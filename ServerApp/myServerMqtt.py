@@ -62,7 +62,7 @@ class MyServerCommands:
         self.flagAlive = False
         self.sender_ack = ''
 
-    def set_destination_data(self, sender, receivers, file_size):
+    def set_destination_data(self, receivers, file_size):
         """
         Description:
         This function allows to set who is the sender, who are the recipients and the size of the file
@@ -72,7 +72,6 @@ class MyServerCommands:
         :param receivers: User or users who will receive the audio file.
         :param file_size: Size of the audio file.
         """
-        self.sender = sender
         self.receivers = receivers
         self.file_size = file_size
 
