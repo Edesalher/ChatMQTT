@@ -52,6 +52,6 @@ except KeyboardInterrupt:
     logging.warning('\x1b[0;31m' + 'DESCONECTÁNDOSE DEL BROKER MQTT...' + '\x1b[;m')
 
 finally:
-    server.get_server().loop_stop()
-    server.get_server().disconnect()
+    server.server.loop_stop()
+    server.server.disconnect()
     logging.info('\x1b[0;31m'+'SE HA DESCONECTADO DEL BROKER. SALIENDO...'+'\x1b[;m')
