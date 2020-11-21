@@ -12,12 +12,11 @@ print(f'\x1b[1;36m'+f'¡Servidor iniciado!'+'\x1b[;m')
 
 class MyServer:
     # Constructor method.
-    def __init__(self):
+    def __init__(self, users_data, ids_list, rooms_list):
         self.server = mqtt.Client(clean_session=True)
-
-    # Allows the server to get the object that represents the client mqtt of the server.
-    def get_server(self):
-        return self.server
+        self.registered_users_data = users_data
+        self.registered_ids = ids_list
+        self.registered_rooms = rooms_list
 
     def send_text(self, destination_topic, msg):
         self.server.publish(destination_topic, msg, qos=qos, retain=False)
@@ -58,17 +57,26 @@ class MyServerCommands:
     def __init__(self, server_object):
         self.server = server_object       # This is the server that has been created.
         self.sender = None
-        self.destination_user = None
+        self.receivers = None
         self.file_size = None
         self.flagAlive = False
         self.sender_ack = ''
 
-    def set_destination_data(self, sender, destination_user, file_size):
+    def set_destination_data(self, sender, receivers, file_size):
+        """
+        Description:
+        This function allows to set who is the sender, who are the recipients and the size of the file
+        to send.
+
+        :param sender: User sending the audio file.
+        :param receivers: User or users who will receive the audio file.
+        :param file_size: Size of the audio file.
+        """
         self.sender = sender
-        self.destination_user = destination_user
+        self.receivers = receivers
         self.file_size = file_size
 
-    def send_FRR(self):
+    def send_FRR(self, destination_user):
         """
         Description:
         Allows the server to send an FRR command to the client when a user requests to send a voice note.
@@ -79,7 +87,7 @@ class MyServerCommands:
         file_size = self.file_size.encode()
         frr_command = command + b'$' + sent_by + b'$' + file_size
 
-        self.server.send_text(f'comandos/{GROUP}/{self.destination_user}', frr_command)
+        self.server.send_text(f'comandos/{GROUP}/{destination_user}', frr_command)
 
     def answer_OK(self):
         """
@@ -125,10 +133,11 @@ class MyServerCommands:
 
 class UserControl:
     # Constructor method.
-    def __init__(self):
-        self.alives_received = []  # Temporary list for the received alives.
-        self.active_clients = []   # This is the list of active clients.
-        self.alive_periods = 0     # Stores the number of alive periods that have passed.
+    def __init__(self, server_object):
+        self.server = server_object  # This is the server that has been created.
+        self.alives_received = []    # Temporary list for the received alives.
+        self.active_clients = []     # This is the list of active clients.
+        self.alive_periods = 0       # Stores the number of alive periods that have passed.
 
     def add_user(self, user):
         """
@@ -169,3 +178,43 @@ class UserControl:
                 active = True
                 break
         return active
+
+    def get_type_of_id(self, id_to_verify):
+        id_type = 'user'
+        for ID in self.server.registered_rooms:
+            if ID == id_to_verify:
+                id_type = 'room'
+                break
+        return id_type
+
+    def check_validity_of_identifier(self, id_to_validate, id_type):
+        it_is_valid = False
+        # Depending on the type of ID, it is choose which list should be read.
+        if id_type == 'user':
+            for ID in self.server.registered_ids:
+                if ID == id_to_validate:
+                    it_is_valid = True
+                    break
+        else:
+            for room in self.server.registered_rooms:
+                if room == id_to_validate:
+                    it_is_valid = True
+                    break
+        return it_is_valid
+
+    def get_members_of_the_room(self, room_id):
+        """
+        Description:
+        Each user is taken from the list and their data is read to verify if the ID of the indicated room is part of
+        their data. This means that the user belongs to the indicated room.
+
+        :param room_id: ID of the room of interest.
+        :return: A list with the members that belong to the room.
+        """
+        members = []
+        for user in range(len(self.server.registered_users_data)):
+            for user_data in self.server.registered_users_data[user]:
+                if user_data == room_id:
+                    members.append(self.server.registered_users_data[user][0])
+                    break
+        return members
