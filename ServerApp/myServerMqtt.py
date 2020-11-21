@@ -102,7 +102,7 @@ class MyServerCommands:
         # self.server.publish(f'comandos/{GROUP}/{reply_to}', ok_command, qos=qos, retain=False)
         self.server.send_text(f'comandos/{GROUP}/{reply_to.decode()}', ok_command)
 
-    def answer_NO(self):
+    def answer_NO(self, reason):
         """
         Description:
         Allows the server to respond NO to the client when a condition has not been met.
@@ -110,7 +110,8 @@ class MyServerCommands:
         """
         command = COMMAND_NO
         reply_to = self.sender.encode()
-        no_command = command + b'$' + reply_to
+        reason = reason.encode()
+        no_command = command + b'$' + reply_to + b'$' + reason
 
         self.server.send_text(f'comandos/{GROUP}/{reply_to.decode()}', no_command)
 
