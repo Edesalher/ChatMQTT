@@ -71,6 +71,7 @@ def on_message(client, userdata, msg):
         logging.info(f'Servidor ha recibido un comando en el topic [{msg.topic}]')
         logging.info(f'Comando << {command}')
         sender = topic_by_parts[2]
+        server_commands.sender = sender
         destination_id = byte_string[1]
         # Getting if the destination is a user or room.
         id_type = control.get_type_of_id(destination_id)
@@ -88,7 +89,7 @@ def on_message(client, userdata, msg):
                         online_members.append(mem)
                 # Checking if at least one member is online.
                 if len(online_members) > 0:
-                    server_commands.set_destination_data(sender, members, file_size)
+                    server_commands.set_destination_data(online_members, file_size)
                     server_commands.answer_OK()
                     logging.info('Servidor responde >> OK')
                 else:
@@ -96,13 +97,15 @@ def on_message(client, userdata, msg):
                     logging.info('Servidor responde >> NO --> Ningún miembro de la sala está en línea.')
             else:
                 if control.check_client_status(destination_id):
-                    server_commands.set_destination_data(sender, destination_id, file_size)
+                    server_commands.set_destination_data(destination_id, file_size)
                     server_commands.answer_OK()
                     logging.info('Servidor responde >> OK')
                 else:
                     server_commands.answer_NO('EL DESTINATARIO NO ESTÁ EN LÍNEA.')
                     logging.info('Servidor responde >> NO --> El usuario destino no está en línea.')
         else:
+            server_commands.receivers = None
+            server_commands.file_size = None
             server_commands.answer_NO('EL ID INGRESADO FUÉ INVÁLIDO.')
             logging.info('Servidor responde >> NO --> ID del destino no es válido.')
 
