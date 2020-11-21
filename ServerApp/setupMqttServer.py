@@ -92,7 +92,7 @@ def on_message(client, userdata, msg):
                     server_commands.answer_OK()
                     logging.info('Servidor responde >> OK')
                 else:
-                    server_commands.answer_NO()
+                    server_commands.answer_NO('LOS DESTINATARIOS NO ESTÁN EN LÍNEA.')
                     logging.info('Servidor responde >> NO --> Ningún miembro de la sala está en línea.')
             else:
                 if control.check_client_status(destination_id):
@@ -100,10 +100,10 @@ def on_message(client, userdata, msg):
                     server_commands.answer_OK()
                     logging.info('Servidor responde >> OK')
                 else:
-                    server_commands.answer_NO()
+                    server_commands.answer_NO('EL DESTINATARIO NO ESTÁ EN LÍNEA.')
                     logging.info('Servidor responde >> NO --> El usuario destino no está en línea.')
         else:
-            server_commands.answer_NO()
+            server_commands.answer_NO('EL ID INGRESADO FUÉ INVÁLIDO.')
             logging.info('Servidor responde >> NO --> ID del destino no es válido.')
 
 
