@@ -13,8 +13,8 @@ SERVER_IP = '192.168.1.18'  # IP of my RPi4.
 SERVER_PORT = 9819
 
 # Configuration file names for the server.
-USERS_FILENAME = 'usuarios.txt'
-ROOMS_FILENAME = 'salas.txt'
+USERS_FILENAME = 'users.txt'
+ROOMS_FILENAME = 'rooms.txt'
 
 # Commands
 COMMAND_FRR = b'\x02'
