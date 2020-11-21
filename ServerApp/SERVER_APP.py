@@ -16,26 +16,34 @@ def wait_connection():
     return connection, client_address
 
 
+def make_audio_sending_process(receiving_user):
+    server_commands.send_FRR(receiving_user)
+    logging.info(f'Servidor envía >> FRR a {receiving_user}')
+    client_connection2, client_add2 = wait_connection()
+    print('\n')
+    new_print(f'Conexión establecida con {client_add2}', 1)
+    logging.info(f'Servidor esta enviando un archivo a {receiving_user}...')
+    server.send_file(client_connection)
+    logging.info('¡Envió finalizado!')
+    client_connection.close()
+
+
 try:
     new_print('\n********* SERVIDOR MQTT **********', 1, 34)
     while True:
         client_connection, client_add = wait_connection()
         print('\n')
         new_print(f'Conexión establecida con {client_add}', 1)
-        logging.info('Servidor esta recibiendo un archivo...')
+        logging.info(f'Servidor esta recibiendo un archivo de {server_commands.sender}...')
         server.receive_file(client_connection)
         logging.info('¡Recepción finalizada!')
         client_connection.close()
-        server_commands.send_FRR()
-        logging.info('Servidor envía >> FRR')
-
-        client_connection, client_add = wait_connection()
-        print('\n')
-        new_print(f'Conexión establecida con {client_add}', 1)
-        logging.info('Servidor esta enviando un archivo...')
-        server.send_file(client_connection)
-        logging.info('¡Envió finalizado!')
-        client_connection.close()
+        # Checking if the receiving user is one or more.
+        if type(server_commands.receivers) == list:
+            for receiver in server_commands.receivers:
+                make_audio_sending_process(receiver)
+        else:
+            make_audio_sending_process(server_commands.receivers)
 
 except KeyboardInterrupt:
     print('\n')
