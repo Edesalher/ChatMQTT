@@ -80,7 +80,8 @@ def on_message(client, userdata, msg):
                     user.send_recorded_audio()
                     logging.info('Nota de voz enviada')
                 else:
-                    logging.error('\x1b[0;31m' + 'NO HA SIDO POSIBLE ENVIAR LA NOTA DE VOZ\n' + '\x1b[;m')
+                    reason = byte_string[2]
+                    logging.error('\x1b[0;31m' + f'NO HA SIDO POSIBLE ENVIAR LA NOTA DE VOZ. {reason}\n' + '\x1b[;m')
             else:
                 user_commands.OKNOID_check = False
 
