@@ -23,9 +23,9 @@ def make_audio_sending_process(receiving_user):
     print('\n')
     new_print(f'Conexión establecida con {client_add2}', 1)
     logging.info(f'Servidor esta enviando un archivo a {receiving_user}...')
-    server.send_file(client_connection)
+    server.send_file(client_connection2)
     logging.info('¡Envió finalizado!')
-    client_connection.close()
+    client_connection2.close()
 
 
 try:
