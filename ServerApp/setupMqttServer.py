@@ -6,31 +6,32 @@ import threading
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s] %(message)s')
 
-# The usuarios.txt file is read to obtain the data and ID of the users.
+# The users.txt file is read to obtain the data and ID of the users.
 users_file = open(USERS_FILENAME, 'r')
-registered_users = []
+registered_users_data = []
 registered_IDs = []
 for user in users_file:
     user = user.split(',')
-    registered_users.append(user)
+    user[-1] = user[-1].rstrip('\n')
+    registered_users_data.append(user)
     registered_IDs.append(user[0])
 users_file.close()
 
-# The salas.txt file is read to obtain the rooms to which the user belongs.
+# The rooms.txt file is read to obtain the rooms to which the users belongs.
 rooms_file = open(ROOMS_FILENAME, 'r')
-myRooms = rooms_file.read()
-myRooms = myRooms.split('\n')
-myRooms.pop()
+rooms = rooms_file.read()
+registered_rooms = rooms.split('\n')
+registered_rooms.pop()
 rooms_file.close()
 
 # Creating a server for the MQTT broker.
-server = MyServer()
+server = MyServer(registered_users_data, registered_IDs, registered_rooms)
 
 # Creating the commands for the server.
 server_commands = MyServerCommands(server)
 
 # A user controller is created for the server to handle the list of active users, validations and others.
-alive = UserControl()
+control = UserControl(server)
 
 
 # Function that is executed when a connection to the broker MQTT occurs.
@@ -46,59 +47,83 @@ def on_publish(client, userdata, mid):
 # Function that is executed when a message reception occurs.
 def on_message(client, userdata, msg):
     topic_by_parts = msg.topic.split('/')
-    # The received byte string is split to read if it is a FTR or ALIVE.
+    # The received byte string is split to read if it is a FTR or ALIVE command.
     byte_string = msg.payload.decode().split('$')
-    command = byte_string[0]
+    command = byte_string[0].encode()
 
-    if command.encode() == COMMAND_ALIVE:
+    if command == COMMAND_ALIVE:
         sender = byte_string[1]
-        # Acá debe ir la verificación de validez del ID.
-        server_commands.sender_ack = sender
-        server_commands.flagAlive = True
-        alive.add_user(sender)
-        if alive.alive_periods == 2:
-            alive.alive_periods = 0
-            alive.refresh_active_clients()
+        # Checking the validity of the user ID.
+        if control.check_validity_of_identifier(sender, 'user'):
+            server_commands.sender_ack = sender
+            server_commands.flagAlive = True
+            control.add_user(sender)
+        # Every 2 alive periods, the server updates the list of active users.
+        if control.alive_periods == 2:
+            control.alive_periods = 0
+            control.refresh_active_clients()
         else:
-            alive.alive_periods += 1
-        logging.debug(f'ACTIVOS >>>>>> {alive.active_clients}')
-    elif command.encode() == COMMAND_FTR:
+            control.alive_periods += 1
+        logging.debug(f'ACTIVOS >>>>>> {control.active_clients}')
+
+    elif command == COMMAND_FTR:
         print('\n')
         logging.info(f'Servidor ha recibido un comando en el topic [{msg.topic}]')
-        logging.info(f'Comando << {command.encode()}')
+        logging.info(f'Comando << {command}')
         sender = topic_by_parts[2]
         destination_id = byte_string[1]
-        # Primero debo comprobar si el remitente y el destino son válido.
-        file_size = byte_string[2]
-        # Algorithm that verifies if the destination is a user or room.
-        # Si el destino es Sala, primero tengo que verificar qué usuarios son de esa sala.
-        # Y luego verifico quiénes de la sala están activos.
-        server_commands.set_destination_data(sender, destination_id, file_size)
-        if alive.check_client_status(destination_id):
-            server_commands.answer_OK()
-            logging.info('Servidor responde >> OK')
+        # Getting if the destination is a user or room.
+        id_type = control.get_type_of_id(destination_id)
+        # Checking the validity of the ID.
+        if control.check_validity_of_identifier(destination_id, id_type):
+            file_size = byte_string[2]
+            if id_type == 'room':
+                ''' If the destination is a room, first, the users belonging to the room are obtained and then it is 
+                    verified which members of the room are online.'''
+                members = control.get_members_of_the_room(destination_id)
+                online_members = []
+                # Checking which member is online.
+                for mem in members:
+                    if control.check_client_status(mem):
+                        online_members.append(mem)
+                # Checking if at least one member is online.
+                if len(online_members) > 0:
+                    server_commands.set_destination_data(sender, members, file_size)
+                    server_commands.answer_OK()
+                    logging.info('Servidor responde >> OK')
+                else:
+                    server_commands.answer_NO()
+                    logging.info('Servidor responde >> NO --> Ningún miembro de la sala está en línea.')
+            else:
+                if control.check_client_status(destination_id):
+                    server_commands.set_destination_data(sender, destination_id, file_size)
+                    server_commands.answer_OK()
+                    logging.info('Servidor responde >> OK')
+                else:
+                    server_commands.answer_NO()
+                    logging.info('Servidor responde >> NO --> El usuario destino no está en línea.')
         else:
             server_commands.answer_NO()
-            logging.info('Servidor responde >> NO')
+            logging.info('Servidor responde >> NO --> ID del destino no es válido.')
 
 
 ''' Handler functions are set for the MQTT server when there is a connection, 
     a message is received, and a message is posted.'''
-server.get_server().on_connect = on_connect
-server.get_server().on_publish = on_publish
-server.get_server().on_message = on_message
+server.server.on_connect = on_connect
+server.server.on_publish = on_publish
+server.server.on_message = on_message
 
 # The username and password for the MQTT broker are set and then the connection is established.
-server.get_server().username_pw_set(MQTT_USER, MQTT_PASS)
-server.get_server().connect(host=MQTT_HOST, port=MQTT_PORT)
+server.server.username_pw_set(MQTT_USER, MQTT_PASS)
+server.server.connect(host=MQTT_HOST, port=MQTT_PORT)
 
 # The thread is started so that the server is attentive to connection, publication and reception events.
-server.get_server().loop_start()
+server.server.loop_start()
 
 # The server subscribes to the corresponding topics.
-server.get_server().subscribe((f'comandos/{GROUP}/#', qos))
+server.server.subscribe((f'comandos/{GROUP}/#', qos))
 for ID in registered_IDs:
-    server.get_server().subscribe((f'comandos/{GROUP}/{ID}', qos))
+    server.server.subscribe((f'comandos/{GROUP}/{ID}', qos))
 
 # A thread is created to receive Alives from the clients in the "background".
 alive_thread = threading.Thread(name='Receive Alive',
